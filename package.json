@@ -1,8 +1,8 @@
 {
-  "name": "bootstrap_vue_presentation_example",
-  "description": "A Vue.js project. For Educational Purposes only.",
+  "name": "PBO-Beleg",
+  "description": "A Vue.js project.",
   "version": "1.0.0",
-  "author": "Dominique Heinelt <s72888@htw-dresden.de>",
+  "author": "Nils Ziem <s73954@htw-dresden.de>",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
