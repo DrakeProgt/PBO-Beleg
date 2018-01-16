@@ -1,152 +1,161 @@
 <template>
     <div>
         <!-- Navbar -->
-        <b-navbar class="bg-bootstrap" type="dark">
+        <b-navbar variant="dark" type="dark">
             <b-container>
-                <b-navbar-brand><i class="fab fa-vuejs"></i> Bootstrap Vue Demo</b-navbar-brand>
+                <b-navbar-brand><img src="Dateien/logo.png" class="d-inline-block align-top"> PBO-Beleg</b-navbar-brand>
             </b-container>
         </b-navbar>
 
-        <!-- Jumbotron + Create Button -->
-        <b-jumbotron fluid>
-            <template slot="header">
-                <span>User Management</span>
-                <div class="float-right">
-                    <b-button size="lg" type="button" variant="success" v-b-modal.form_modal><i class="fas fa-plus"></i> New User</b-button>
-                </div>
-            </template>
-        </b-jumbotron>
-
-        <!-- Table -->
         <b-container>
-            <b-table bordered striped v-bind:items="items" v-bind:fields="fields">
-                <template slot="active" slot-scope="row">
-                    <b-badge v-if="row.item.isActive === true" variant="success">Active</b-badge>
-                    <b-badge v-if="row.item.isActive === false" variant="secondary">Inactive</b-badge>
-                </template>
-                <template slot="actions" slot-scope="row">
-                    <b-button size="sm" variant="danger" v-on:click="deleteRow(row.item.id)"><i class="fas fa-times"></i> Delete</b-button>
-                </template>
-            </b-table>
-        </b-container>
+    <!-- User Interface controls -->
+    <b-row>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Filter" class="mb-0">
+          <b-input-group>
+            <b-form-input v-model="filter" placeholder="Type to Search" />
+            <b-input-group-button>
+              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+            </b-input-group-button>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Sort" class="mb-0">
+          <b-input-group>
+            <b-form-select v-model="sortBy" :options="sortOptions">
+              <option slot="first" :value="null">-- none --</option>
+            </b-form-select>
+            <b-input-group-button>
+              <b-form-select :disabled="!sortBy" v-model="sortDesc">
+                <option :value="false">Asc</option>
+                <option :value="true">Desc</option>
+              </b-form-select>
+            </b-input-group-button>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+      <b-col md="6" class="my-1">
+        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+      </b-col>
+      <b-col md="6" class="my-1">
+        <b-form-group horizontal label="Per page" class="mb-0">
+          <b-form-select :options="pageOptions" v-model="perPage" />
+        </b-form-group>
+      </b-col>
+    </b-row>
 
-        <!-- Modal Form -->
-        <b-modal id="form_modal" title="Create new User" header-bg-variant="dark" header-text-variant="light" ok-variant="success" v-on:ok="submitForm">
-            <template slot="modal-ok"> <!-- Oder ok-title="Create User" -->
-                <i class="fas fa-plus"></i> Create User
-            </template>
+    <!-- Main table element -->
+    <b-table show-empty
+             stacked="md"
+             :items="items"
+             :fields="fields"
+             :current-page="currentPage"
+             :per-page="perPage"
+             :filter="filter"
+             :sort-by.sync="sortBy"
+             :sort-desc.sync="sortDesc"
+             @filtered="onFiltered"
+    >
+      <template slot="name" slot-scope="row">{{row.value.first}} {{row.value.last}}</template>
+      <template slot="isActive" slot-scope="row">{{row.value?'Yes :)':'No :('}}</template>
+      <template slot="actions" slot-scope="row">
+        <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
+        <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
+          Info modal
+        </b-button>
+        <b-button size="sm" @click.stop="row.toggleDetails">
+          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+        </b-button>
+      </template>
+      <template slot="row-details" slot-scope="row">
+        <b-card>
+          <ul>
+            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value}}</li>
+          </ul>
+        </b-card>
+      </template>
+    </b-table>
 
-            <b-form>
-                <b-form-group label="Your Firstname:">
-                    <b-form-input type="text" v-model="form.firstname" placeholder="Firstname"></b-form-input>
-                </b-form-group>
-                <b-form-group label="Your Lastname:">
-                    <b-form-input type="text" v-model="form.lastname" placeholder="Lastname"></b-form-input>
-                </b-form-group>
-                <b-form-group label="Your Age:">
-                    <b-form-input type="number" v-model="form.age" placeholder="Age"></b-form-input>
-                </b-form-group>
-                <b-form-group>
-                    <b-form-checkbox v-model="form.active">Active</b-form-checkbox>
-                </b-form-group>
-            </b-form>
-        </b-modal>
+    <!-- Info modal -->
+    <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
+      <pre>{{ modalInfo.content }}</pre>
+    </b-modal>
+
+  </b-container>
     </div>
 </template>
 
 <script>
+    //import json from 'Dateien/process.json'
+    const items = [
+  { isActive: true, age: 40, name: { first: 'Dickerson', last: 'Macdonald' } },
+  { isActive: false, age: 21, name: { first: 'Larsen', last: 'Shaw' } },
+  {
+    isActive: false,
+    age: 9,
+    name: { first: 'Mini', last: 'Navarro' },
+    _rowVariant: 'success'
+  },
+  { isActive: false, age: 89, name: { first: 'Geneva', last: 'Wilson' } },
+  { isActive: true, age: 38, name: { first: 'Jami', last: 'Carney' } },
+  { isActive: false, age: 27, name: { first: 'Essie', last: 'Dunlap' } },
+  { isActive: true, age: 40, name: { first: 'Thor', last: 'Macdonald' } },
+  {
+    isActive: true,
+    age: 87,
+    name: { first: 'Larsen', last: 'Shaw' },
+    _cellVariants: { age: 'danger', isActive: 'warning' }
+  },
+  { isActive: false, age: 26, name: { first: 'Mitzi', last: 'Navarro' } },
+  { isActive: false, age: 22, name: { first: 'Genevieve', last: 'Wilson' } },
+  { isActive: true, age: 38, name: { first: 'John', last: 'Carney' } },
+  { isActive: false, age: 29, name: { first: 'Dick', last: 'Dunlap' } }
+]
     export default {
-        data: function () {
-            return {
-                /**
-                 * Table Column Definitions
-                 */
-                fields: [
-                    { key: 'active', label: 'Active' },
-                    { key: 'first_name', sortable: true },
-                    { key: 'last_name', sortable: true },
-                    { key: 'age', sortable: true },
-                    { key: 'actions', label: 'Actions' }
-                ],
-                /**
-                 * Table Raw Data
-                 */
-                items: [
-                    { id: 1, isActive: true, age: 40, first_name: 'Jan', last_name: 'Turner' },
-                    { id: 2, isActive: false, age: 21, first_name: 'Katherine', last_name: 'Stewart' },
-                    { id: 3, isActive: false, age: 89, first_name: 'John', last_name: 'Henderson' },
-                    { id: 4, isActive: true, age: 38, first_name: 'Anne', last_name: 'Wilson' },
-                    { id: 5, isActive: true, age: 18, first_name: 'Robert', last_name: 'Pullman' },
-                    { id: 6, isActive: false, age: 24, first_name: 'Stephen', last_name: 'Clarkson' },
-                    { id: 7, isActive: true, age: 28, first_name: 'Caroline', last_name: 'Duncan' },
-                ],
-                /**
-                 * Form Data Vars
-                 */
-                form: {
-                    firstname: '',
-                    lastname: '',
-                    age: 0,
-                    active: false
-                },
-            }
-        },
-        methods: {
-            /**
-             * Delete Table Row Function
-             * @param delete_id
-             */
-            deleteRow: function ( delete_id ) {
-                this.items = this.items.filter( function ( item ) {
-                    return item.id !== delete_id;
-                } );
-            },
-
-            /**
-             * Add Table Row Function
-             * @param row
-             */
-            addRow: function ( row ) {
-                this.items.push( row );
-            },
-
-            /**
-             * Returns the next auto increment id
-             * @return int
-             */
-            getNextAutoId: function () {
-                if ( this.items.length === 0 ) {
-                    return 0;
-                }
-
-                return this.items[ this.items.length - 1 ].id + 1;
-            },
-
-            /**
-             * Clear Form Function
-             */
-            clearForm: function () {
-                this.form.firstname = '';
-                this.form.lastname = '';
-                this.form.age = 0;
-                this.form.active = false;
-            },
-
-            /**
-             * Form Submit Event Handler
-             */
-            submitForm: function () {
-                this.addRow( {
-                    id: this.getNextAutoId(),
-                    isActive: this.form.active,
-                    age: this.form.age,
-                    first_name: this.form.firstname,
-                    last_name: this.form.lastname
-                } );
-
-                this.clearForm();
-            }
-        }
+        data () {
+    return {
+      items: items,
+      fields: [
+        { key: 'name', label: 'Person Full name', sortable: true },
+        { key: 'age', label: 'Person age', sortable: true, 'class': 'text-center' },
+        { key: 'isActive', label: 'is Active' },
+        { key: 'actions', label: 'Actions' }
+      ],
+      currentPage: 1,
+      perPage: 5,
+      totalRows: items.length,
+      pageOptions: [ 5, 10, 15 ],
+      sortBy: null,
+      sortDesc: false,
+      filter: null,
+      modalInfo: { title: '', content: '' }
+    }
+  },
+  computed: {
+    sortOptions () {
+      // Create an options list from our fields
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => { return { text: f.label, value: f.key } })
+    }
+  },
+  methods: {
+    info (item, index, button) {
+      this.modalInfo.title = `Row index: ${index}`
+      this.modalInfo.content = JSON.stringify(item, null, 2)
+      this.$root.$emit('bv::show::modal', 'modalInfo', button)
+    },
+    resetModal () {
+      this.modalInfo.title = ''
+      this.modalInfo.content = ''
+    },
+    onFiltered (filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length
+      this.currentPage = 1
+    }
+  }
     }
 </script>
 
