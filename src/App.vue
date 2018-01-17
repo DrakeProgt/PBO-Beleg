@@ -8,42 +8,42 @@
         </b-navbar>
 
         <b-container>
-    <!-- User Interface controls -->
-    <b-row>
-      <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Filter" class="mb-0">
-          <b-input-group>
-            <b-form-input v-model="filter" placeholder="Type to Search" />
-            <b-input-group-button>
-              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
-            </b-input-group-button>
-          </b-input-group>
-        </b-form-group>
-      </b-col>
-      <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Sort" class="mb-0">
-          <b-input-group>
-            <b-form-select v-model="sortBy" :options="sortOptions">
-              <option slot="first" :value="null">-- none --</option>
-            </b-form-select>
-            <b-input-group-button>
-              <b-form-select :disabled="!sortBy" v-model="sortDesc">
-                <option :value="false">Asc</option>
-                <option :value="true">Desc</option>
-              </b-form-select>
-            </b-input-group-button>
-          </b-input-group>
-        </b-form-group>
-      </b-col>
-      <b-col md="6" class="my-1">
-        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-      </b-col>
-      <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Per page" class="mb-0">
-          <b-form-select :options="pageOptions" v-model="perPage" />
-        </b-form-group>
-      </b-col>
-    </b-row>
+          <!-- User Interface controls -->
+          <b-row>
+            <b-col md="6" class="my-1">
+              <b-form-group horizontal label="Filter" class="mb-0">
+                <b-input-group>
+                  <b-form-input v-model="filter" placeholder="Type to Search" />
+                  <b-input-group-button>
+                    <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                  </b-input-group-button>
+                </b-input-group>
+              </b-form-group>
+            </b-col>
+            <b-col md="6" class="my-1">
+              <b-form-group horizontal label="Sort" class="mb-0">
+                <b-input-group>
+                  <b-form-select v-model="sortBy" :options="sortOptions">
+                    <option slot="first" :value="null">-- none --</option>
+                  </b-form-select>
+                  <b-input-group-button>
+                    <b-form-select :disabled="!sortBy" v-model="sortDesc">
+                      <option :value="false">Asc</option>
+                      <option :value="true">Desc</option>
+                    </b-form-select>
+                  </b-input-group-button>
+                </b-input-group>
+              </b-form-group>
+            </b-col>
+            <b-col md="6" class="my-1">
+              <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+            </b-col>
+            <b-col md="6" class="my-1">
+              <b-form-group horizontal label="Per page" class="mb-0">
+                <b-form-select :options="pageOptions" v-model="perPage" />
+              </b-form-group>
+            </b-col>
+          </b-row>
 
     <!-- Main table element -->
     <b-table show-empty
