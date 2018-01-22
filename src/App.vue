@@ -10,36 +10,38 @@
         <b-container>
           <!-- User Interface controls -->
           <b-row>
-            <b-col md="6" class="my-1">
-              <b-form-group horizontal label="Filter" class="mb-0">
+            <b-col md="6" class="my-4">
+              <b-form-group horizontal label="Suche:">
                 <b-input-group>
-                  <b-form-input v-model="filter" placeholder="Type to Search" />
+                  <b-form-input v-model="filter" placeholder="Name oder Alter" />
                   <b-input-group-button>
-                    <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                    <b-btn :disabled="!filter" @click="filter = ''" variant="outline-danger">säubern</b-btn>
                   </b-input-group-button>
                 </b-input-group>
               </b-form-group>
             </b-col>
-            <b-col md="6" class="my-1">
-              <b-form-group horizontal label="Sort" class="mb-0">
+            <b-col md="6" class="my-4">
+              <b-form-group horizontal label="Sortierung:">
                 <b-input-group>
                   <b-form-select v-model="sortBy" :options="sortOptions">
-                    <option slot="first" :value="null">-- none --</option>
+                    <option slot="first" :value="null">keine</option>
                   </b-form-select>
                   <b-input-group-button>
                     <b-form-select :disabled="!sortBy" v-model="sortDesc">
-                      <option :value="false">Asc</option>
-                      <option :value="true">Desc</option>
+                      <option :value="false">Aufwärts</option>
+                      <option :value="true">Abwärts</option>
                     </b-form-select>
                   </b-input-group-button>
                 </b-input-group>
               </b-form-group>
             </b-col>
-            <b-col md="6" class="my-1">
-              <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+            <b-col md="6" class="my-2">
+              <b-form-group horizontal label="Seite:">              
+                <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" />
+              </b-form-group>
             </b-col>
-            <b-col md="6" class="my-1">
-              <b-form-group horizontal label="Per page" class="mb-0">
+            <b-col md="6" class="my-2">
+              <b-form-group horizontal label="Treffer pro Seite:">
                 <b-form-select :options="pageOptions" v-model="perPage" />
               </b-form-group>
             </b-col>
