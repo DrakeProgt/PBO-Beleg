@@ -38,6 +38,7 @@
             <b-col md="6" class="my-2">
               <b-form-group horizontal label="Seite:">              
                 <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" />
+                <b-form-checkbox v-model="striped">gestreifte Zeilen</b-form-checkbox>
               </b-form-group>
             </b-col>
             <b-col md="6" class="my-2">
@@ -58,16 +59,17 @@
              :sort-by.sync="sortBy"
              :sort-desc.sync="sortDesc"
              @filtered="onFiltered"
+             :striped="striped"
     >
       <template slot="name" slot-scope="row">{{row.value.first}} {{row.value.last}}</template>
       <template slot="isActive" slot-scope="row">{{row.value?'Yes :)':'No :('}}</template>
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-        <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
+        <b-button v-b-tooltip.hover title="Zeigt Struktur in JSON-Form" size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-3">
+          JSON
         </b-button>
-        <b-button size="sm" @click.stop="row.toggleDetails">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+        <b-button v-b-tooltip.hover title="Zeigt Informationen in einer Liste an" size="sm" @click.stop="row.toggleDetails">
+          Liste {{ row.detailsShowing ? 'Zuklappen' : 'Ausklappen' }}
         </b-button>
       </template>
       <template slot="row-details" slot-scope="row">
@@ -131,6 +133,7 @@
       sortBy: null,
       sortDesc: false,
       filter: null,
+      striped: true,
       modalInfo: { title: '', content: '' }
     }
   },
