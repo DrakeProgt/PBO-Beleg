@@ -1,9 +1,9 @@
 <template>
   <div>
 
-    <b-navbar variant="dark" type="dark">
+    <b-navbar type="dark">
       <b-container>
-        <b-navbar-brand><img src="Dateien/logo.png" class="d-inline-block align-top"> PBO-Beleg</b-navbar-brand>
+        <b-navbar-brand>Stakeholder</b-navbar-brand>
       </b-container>
     </b-navbar>
 
@@ -212,7 +212,7 @@ import JSON from '../Dateien/process.json';
                   labelString: 'Anzahl der initiierten Events',
                   fontColor: '#000',
                   fontStyle: 'bold',
-                  fontSize: 14
+                  fontSize: 16
                 },
                 ticks: {
                   beginAtZero: true,
@@ -226,7 +226,7 @@ import JSON from '../Dateien/process.json';
                   labelString: 'Jahre',
                   fontColor: '#000',
                   fontStyle: 'bold',
-                  fontSize: 14
+                  fontSize: 16
                 }
               }]
             }
@@ -303,7 +303,20 @@ import JSON from '../Dateien/process.json';
 
 <style>
   .chart-container {  
-  margin: auto;
-  width: 99%;
+    margin: auto;
+    width: 99%;
+  }
+
+  .table-hover tbody tr:hover td {
+    background-color: #4CA2FF;
+  }
+
+  .navbar {
+    background: #00388C;
+  }
+
+  .navbar-brand {
+    font-size: xx-large;
+    padding: 10px 0px 10px 0px;
   }
 </style>
